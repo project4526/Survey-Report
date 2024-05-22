@@ -1,0 +1,99 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  *{
+    padding: 0;
+    margin: 0;
+  }
+  body{
+    font-family: 'Arial' , sans-serif;
+    background: #ff242217;
+  }
+  input{
+    background: transparent;
+    margin-top: 10px;
+    margin-left: 10px;
+  }
+  .txt{
+    padding: 4px;
+    border: none;
+    border-bottom: 1px solid #000;
+    outline: none;
+  }
+  .btn{
+    padding: 4px;
+    width: 160px;
+    background: purple;
+    color: #FFF;
+    border: none;
+    border-radius: 25px;
+  }
+  input[type="file"]::file-selector-button {
+  border: 2px solid #6c5ce7;
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+  background-color: #a29bfe;
+  transition: 1s;
+}
+.image{
+  width: 130px;
+  border-radius: 8px;
+}
+.image-con{
+  margin-left: 16px;
+  margin-bottom: 10px;
+}
+h2{
+  text-decoration: underline;
+  margin-left: 10px;
+  margin-top: 10px;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+</style>
+<h2>Pay Form</h2>
+  <form id="submitForm">
+    <input type="text" id="name" name="name" required placeholder="Name:" class="txt">
+    <br><br>
+    <input type="email" id="email" name="email" required placeholder="E-mail" class="txt">
+    <br><br>
+    <label for="image" style="margin-left: 10px;">Upload Image:</label><br>
+    <input type="file" id="image" name="image" accept="image/*" required>
+    <br><br>
+    <div class="image-con">
+  <img src="qr-code.jpeg" class="image">
+    </div>
+    <input type="submit" value="Submit" class="btn">
+  </form>
+
+  <script>
+    document.getElementById('submitForm').onsubmit = function(e) {
+      e.preventDefault(); // Prevent the default form submission
+
+      const form = document.getElementById('submitForm');
+      const formData = new FormData(form);
+      const fileInput = document.getElementById('image').files[0];
+
+      if (fileInput) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const base64String = event.target.result.split(',')[1];
+          formData.append('image', base64String);
+          formData.append('imageName', fileInput.name);
+          formData.append('imageType', fileInput.type);
+
+          fetch('https://script.google.com/macros/s/AKfycbw-Slihv3JkBuhzGNYMQrDC8MURsHCW7M293jOYCOcPYEaEKQqytRckpcpoaST4qI34Rw/exec', {
+            method: 'POST',
+            body: formData
+          })
+          .then(response => response.text())
+          .then(result => {
+            alert(result);
+            form.reset();
+          })
+          .catch(error => console.error('Error!', error.message));
+        };
+        reader.readAsDataURL(fileInput);
+      }
+    };
+  </script>
